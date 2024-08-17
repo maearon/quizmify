@@ -35,5 +35,3 @@ Timestamps:
 4:24:59 Quiz History
 4:36:49 Word Cloud Topic Count
 4:46:22 Deploy To Vercel
-
-![thumbnail 7](https://www.youtube.com/watch?v=vIyU4nInlt0)

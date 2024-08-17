@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
 export const runtime = "nodejs";
-export const maxDuration = 500;
+export const maxDuration = 60;
 
 export async function POST(req: Request, res: Response) {
   try {
