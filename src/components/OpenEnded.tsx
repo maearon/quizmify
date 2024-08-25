@@ -3,7 +3,7 @@ import { cn, formatTimeDelta } from "@/lib/utils";
 import { Game, Question } from "@prisma/client";
 import { differenceInSeconds } from "date-fns";
 import { BarChart, ChevronRight, Loader2, Timer } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardDescription,
@@ -43,13 +43,16 @@ const OpenEnded = ({ game }: Props) => {
   });
   const { toast } = useToast();
   const [now, setNow] = React.useState(new Date());
-  const { mutate: checkAnswer, isLoading: isChecking } = useMutation({
+  const { mutate: checkAnswer, isPending: isChecking } = useMutation({
     mutationFn: async () => {
       let filledAnswer = blankAnswer;
-      document.querySelectorAll("#user-blank-input").forEach((input) => {
-        filledAnswer = filledAnswer.replace("_____", input.value);
-        input.value = "";
-      });
+      if (typeof window !== "undefined") {
+        document.querySelectorAll("#user-blank-input").forEach((element) => {
+          const input = element as HTMLInputElement;
+          filledAnswer = filledAnswer.replace("_____", input.value);
+          input.value = "";
+        });
+      }
       const payload: z.infer<typeof checkAnswerSchema> = {
         questionId: currentQuestion.id,
         userInput: filledAnswer,
@@ -58,7 +61,7 @@ const OpenEnded = ({ game }: Props) => {
       return response.data;
     },
   });
-  React.useEffect(() => {
+  useEffect(() => {
     if (!hasEnded) {
       const interval = setInterval(() => {
         setNow(new Date());
@@ -92,17 +95,19 @@ const OpenEnded = ({ game }: Props) => {
       },
     });
   }, [checkAnswer, questionIndex, toast, endGame, game.questions.length]);
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key;
-      if (key === "Enter") {
-        handleNext();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        const key = event.key;
+        if (key === "Enter") {
+          handleNext();
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
   }, [handleNext]);
 
   if (hasEnded) {

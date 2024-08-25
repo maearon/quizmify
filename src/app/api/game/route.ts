@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { getAuthSession } from "@/lib/nextauth";
+import { validateRequest } from "@/auth";
 import { quizCreationSchema } from "@/schemas/forms/quiz";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -7,7 +7,7 @@ import axios from "axios";
 
 export async function POST(req: Request, res: Response) {
   try {
-    const session = await getAuthSession();
+    const session = await validateRequest();
     if (!session?.user) {
       return NextResponse.json(
         { error: "You must be logged in to create a game." },
@@ -117,7 +117,7 @@ export async function POST(req: Request, res: Response) {
 }
 export async function GET(req: Request, res: Response) {
   try {
-    const session = await getAuthSession();
+    const session = await validateRequest();
     if (!session?.user) {
       return NextResponse.json(
         { error: "You must be logged in to create a game." },

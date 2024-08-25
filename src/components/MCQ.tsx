@@ -1,6 +1,6 @@
 "use client";
 import { Game, Question } from "@prisma/client";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardDescription,
@@ -44,7 +44,7 @@ const MCQ = ({ game }: Props) => {
   }, [currentQuestion]);
 
   const { toast } = useToast();
-  const { mutate: checkAnswer, isLoading: isChecking } = useMutation({
+  const { mutate: checkAnswer, isPending: isChecking } = useMutation({
     mutationFn: async () => {
       const payload: z.infer<typeof checkAnswerSchema> = {
         questionId: currentQuestion.id,
@@ -65,7 +65,7 @@ const MCQ = ({ game }: Props) => {
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       if (!hasEnded) {
         setNow(new Date());
@@ -85,7 +85,6 @@ const MCQ = ({ game }: Props) => {
           toast({
             title: "Correct",
             description: "You got it right!",
-            variant: "success",
           });
         } else {
           setStats((stats) => ({
@@ -108,28 +107,28 @@ const MCQ = ({ game }: Props) => {
     });
   }, [checkAnswer, questionIndex, game.questions.length, toast, endGame]);
 
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key;
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        const key = event.key;
 
-      if (key === "1") {
-        setSelectedChoice(0);
-      } else if (key === "2") {
-        setSelectedChoice(1);
-      } else if (key === "3") {
-        setSelectedChoice(2);
-      } else if (key === "4") {
-        setSelectedChoice(3);
-      } else if (key === "Enter") {
-        handleNext();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+        if (key === "1") {
+          setSelectedChoice(0);
+        } else if (key === "2") {
+          setSelectedChoice(1);
+        } else if (key === "3") {
+          setSelectedChoice(2);
+        } else if (key === "4") {
+          setSelectedChoice(3);
+        } else if (key === "Enter") {
+          handleNext();
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
   }, [handleNext]);
 
   if (hasEnded) {

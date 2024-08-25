@@ -1,31 +1,50 @@
-import { cn } from "@/lib/utils";
-import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Providers from "@/components/Providers";
-import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
+import localFont from "next/font/local";
+import { extractRouterConfig } from "uploadthing/server";
+import { fileRouter } from "./api/uploadthing/core";
+import "./globals.css";
+import ReactQueryProvider from "./ReactQueryProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+});
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+});
 
 export const metadata: Metadata = {
-  title: "Quizmify",
-  description: "Quiz yourself on anything!",
+  title: {
+    template: "%s | Interview Questions",
+    default: "Interview Questions",
+  },
+  description: "The Interview Questions app for staffs",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "antialiased min-h-screen pt-16")}>
-        <Providers>
-          <Navbar />
-          {children}
-          <Toaster />
-        </Providers>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <NextSSRPlugin routerConfig={extractRouterConfig(fileRouter)} />
+        <ReactQueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ReactQueryProvider>
+        <Toaster />
       </body>
     </html>
   );

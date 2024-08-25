@@ -1,32 +1,28 @@
-import { type User } from "next-auth";
-import React from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import avatarPlaceholder from "@/assets/avatar-placeholder.png";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { type AvatarProps } from "@radix-ui/react-avatar";
 
-interface Props extends AvatarProps {
-  user: Pick<User, "name" | "image">;
+interface UserAvatarProps {
+  avatarUrl: string | null | undefined;
+  size?: number;
+  className?: string;
 }
 
-const UserAvatar = ({ user, ...props }: Props) => {
+export default function UserAvatar({
+  avatarUrl,
+  size,
+  className,
+}: UserAvatarProps) {
   return (
-    <Avatar {...props}>
-      {user.image ? (
-        <div className="relative w-full h-full aspect-square">
-          <Image
-            fill
-            src={user.image}
-            alt="profile picture"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-      ) : (
-        <AvatarFallback>
-          <span className="sr-only ">{user?.name}</span>
-        </AvatarFallback>
+    <Image
+      src={avatarUrl || avatarPlaceholder}
+      alt="User avatar"
+      width={size ?? 48}
+      height={size ?? 48}
+      className={cn(
+        "aspect-square h-fit flex-none rounded-full bg-secondary object-cover",
+        className,
       )}
-    </Avatar>
+    />
   );
-};
-
-export default UserAvatar;
+}

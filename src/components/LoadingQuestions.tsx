@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Progress } from "./ui/progress";
 import Image from "next/image";
 
@@ -15,7 +15,7 @@ const loadingTexts = [
 const LoadingQuestions = ({ finished }: Props) => {
   const [progress, setProgress] = React.useState(10);
   const [loadingText, setLoadingText] = React.useState(loadingTexts[0]);
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       let randomIndex = Math.floor(Math.random() * loadingTexts.length);
       setLoadingText(loadingTexts[randomIndex]);
@@ -23,7 +23,7 @@ const LoadingQuestions = ({ finished }: Props) => {
     return () => clearInterval(interval);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (finished) return 100;

@@ -1,5 +1,5 @@
 import { strict_output } from "@/lib/gpt";
-import { getAuthSession } from "@/lib/nextauth";
+import { validateRequest } from "@/auth";
 import { getQuestionsSchema } from "@/schemas/questions";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -9,7 +9,7 @@ export const maxDuration = 60;
 
 export async function POST(req: Request, res: Response) {
   try {
-    const session = await getAuthSession();
+    const session = await validateRequest();
     // if (!session?.user) {
     //   return NextResponse.json(
     //     { error: "You must be logged in to create a game." },

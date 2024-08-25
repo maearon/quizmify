@@ -6,7 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import WordCloud from "../WordCloud";
+import dynamic from 'next/dynamic';
+const WordCloud = dynamic(() => import('../WordCloud'), { ssr: false });
 import { prisma } from "@/lib/db";
 
 type Props = {};

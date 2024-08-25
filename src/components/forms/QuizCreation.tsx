@@ -41,7 +41,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
   const [showLoader, setShowLoader] = React.useState(false);
   const [finishedLoading, setFinishedLoading] = React.useState(false);
   const { toast } = useToast();
-  const { mutate: getQuestions, isLoading } = useMutation({
+  const { mutate: getQuestions, isPending } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
       const response = await axios.post("/api/game", { amount, topic, type });
       return response.data;
@@ -171,7 +171,7 @@ const QuizCreation = ({ topic: topicParam }: Props) => {
                   <BookOpen className="w-4 h-4 mr-2" /> Open Ended
                 </Button>
               </div>
-              <Button disabled={isLoading} type="submit">
+              <Button disabled={isPending} type="submit">
                 Submit
               </Button>
             </form>

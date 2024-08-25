@@ -1,56 +1,68 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  // provider     = "postgresql"
-  // url          = env("POSTGRES_URL")
-  relationMode = "prisma"
+  provider  = "mongodb"
+  url       = env("MONGODB_PRISMA_URL")
+}
+
+model User {
+  id                    String @id @default(cuid()) @map("_id")
+  name                  String?      @db.String
+  username              String         @unique
+  displayName           String
+  email                       String?      @unique(map: "index_admin_users_email_uniqueness") @db.String
+  refresh_token               String?      @unique(map: "index_admin_users_refresh_token_uniqueness") @db.String
+  refresh_token_expiration_at DateTime?    
+  created_at                  DateTime     
+  createdAt DateTime @default(now())
+  updated_at                  DateTime     
+  password_digest             String?      @db.String
+  passwordHash          String?
+  googleId              String?        @unique
+  avatarUrl             String?
+  bio                   String?
+  remember_digest             String?      @db.String
+  admin                       Boolean?     @default(false)
+  activation_digest           String?      @db.String
+  activated                   Boolean?     @default(false)
+  activated_at                DateTime?    
+  reset_digest                String?      @db.String
+  reset_sent_at               DateTime?    
+  games                       Game[]
+  accounts                    Account[]
+  sessions                    Session[]
+  posts                 Post[]
+  following             Follow[]       @relation("Following")
+  followers             Follow[]       @relation("Followers")
+  likes                 Like[]
+  bookmarks             Bookmark[]
+  comments              Comment[]
+  receivedNotifications Notification[] @relation("Recipient")
+  issuedNotifications   Notification[] @relation("Issuer")
+
+  @@map("users")
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String @id @default(cuid()) @map("_id")
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String? @db.String
+  access_token      String? @db.String
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String? @db.String
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  games         Game[]
-  accounts      Account[]
-  sessions      Session[]
 }
 
 enum GameType {
@@ -59,7 +71,7 @@ enum GameType {
 }
 
 model Game {
-  id          String     @id @default(cuid())
+  id          String @id @default(cuid()) @map("_id")
   userId      String
   questions   Question[]
   timeStarted DateTime
@@ -72,13 +84,13 @@ model Game {
 }
 
 model topic_count {
-  id    String @id @default(cuid())
+  id    String @id @default(cuid()) @map("_id")
   topic String @unique
   count Int
 }
 
 model Question {
-  id                String   @id @default(cuid())
+  id                String @id @default(cuid()) @map("_id")
   question          String
   answer            String
   gameId            String
@@ -91,4 +103,117 @@ model Question {
   game Game @relation(fields: [gameId], references: [id])
 
   @@index([gameId])
+}
+
+model Session {
+  id        String @id @default(cuid()) @map("_id")
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+
+model Follow {
+  id          String @id @default(cuid()) @map("_id")
+  followerId  String
+  follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User   @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Post {
+  id                  String         @id @default(cuid()) @map("_id")
+  content             String
+  userId              String
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attachments         Media[]
+  likes               Like[]
+  bookmarks           Bookmark[]
+  comments            Comment[]
+  linkedNotifications Notification[]
+
+  createdAt DateTime @default(now())
+
+  @@map("posts")
+}
+
+model Media {
+  id     String    @id @default(cuid()) @map("_id")
+  postId String?
+  post   Post?     @relation(fields: [postId], references: [id], onDelete: SetNull)
+  media_type   MediaType
+  url    String
+
+  createdAt DateTime @default(now())
+
+  @@map("post_media")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model Comment {
+  id      String @id @default(cuid()) @map("_id")
+  content String
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId  String
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("comments")
+}
+
+model Like {
+  id     String @id @default(cuid()) @map("_id")
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("likes")
+}
+
+model Bookmark {
+  id     String @id @default(cuid()) @map("_id")
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@map("bookmarks")
+}
+
+model Notification {
+  id          String           @id @default(cuid()) @map("_id")
+  recipientId String
+  recipient   User             @relation("Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  issuerId    String
+  issuer      User             @relation("Issuer", fields: [issuerId], references: [id], onDelete: Cascade)
+  postId      String?
+  post        Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  read        Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  LIKE
+  FOLLOW
+  COMMENT
 }
