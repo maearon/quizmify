@@ -2,6 +2,7 @@
 
 A test app use AI with infinite loading, optimistic updates, authentication, DMs, notifications, file uploads, and much more.
 
+'''
 npx prisma generate
 npx prisma db push
 node seed.js
@@ -11,9 +12,11 @@ use ec-test-dev
 db.questions.findOne({ _id: "66c595640d63055697fd6a44" } )
 npm i
 npx next dev
+'''
 
 Settings MongoDB run in replica set on local machine:
 
+'''
 sudo systemctl stop mongod
 mongod --replSet rs0 --dbpath /var/lib/mongodb --bind_ip localhost
 /ect/mongod.conf
@@ -35,7 +38,10 @@ sudo tail -f /var/log/mongodb/mongod.log
 npx prisma init
 rm -rf node_modules
 rm package-lock.json
+''' 
+
 On Win 10:
+'''
 & "C:\Windows\System32\net.exe" stop MongoDB
 
 "C:\Program Files\MongoDB\Server\7.0\bin"
@@ -63,6 +69,7 @@ $env:NODE_TLS_REJECT_UNAUTHORIZED="0"
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 npx prisma generate
 Remove-Item -Recurse -Force node_modules
+'''
 
 Quiz Type: mcq: "Multiple Choice Question" and open-ended: "Open-ended"
 
