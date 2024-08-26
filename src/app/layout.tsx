@@ -7,6 +7,9 @@ import { extractRouterConfig } from "uploadthing/server";
 import { fileRouter } from "./api/uploadthing/core";
 import "./globals.css";
 import ReactQueryProvider from "./ReactQueryProvider";
+import SessionProvider from "./SessionProvider";
+import Navbar from "./Navbar";
+import { validateRequest } from "@/auth";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,11 +28,13 @@ export const metadata: Metadata = {
   description: "The Interview Questions app for staffs",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await validateRequest();
+  
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -41,7 +46,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <SessionProvider value={session}>
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <div className="mx-auto flex w-full max-w-7xl grow gap-5 p-5 flex-1 items-center justify-center">
+                  {children}
+                </div>
+              </div>
+            </SessionProvider>
           </ThemeProvider>
         </ReactQueryProvider>
         <Toaster />

@@ -4,8 +4,8 @@ import { Session, User } from "lucia";
 import React, { createContext, useContext } from "react";
 
 interface SessionContext {
-  user: User;
-  session: Session;
+  user: User | null;
+  session: Session | null;
 }
 
 const SessionContext = createContext<SessionContext | null>(null);

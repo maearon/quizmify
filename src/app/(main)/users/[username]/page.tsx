@@ -1,8 +1,4 @@
 import { validateRequest } from "@/auth";
-import FollowButton from "@/components/FollowButton";
-import FollowerCount from "@/components/FollowerCount";
-import Linkify from "@/components/Linkify";
-import TrendsSidebar from "@/components/TrendsSidebar";
 import UserAvatar from "@/components/UserAvatar";
 import prisma from "@/lib/prisma";
 import { FollowerInfo, getUserDataSelect, UserData } from "@/lib/types";
@@ -12,7 +8,6 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import EditProfileButton from "./EditProfileButton";
-import UserPosts from "./UserPosts";
 // import { useSession } from "@/app/(main)/SessionProvider";
 
 interface PageProps {
@@ -69,14 +64,7 @@ export default async function Page({ params: { username } }: PageProps) {
     <main className="flex w-full min-w-0 gap-5">
       <div className="w-full min-w-0 space-y-5">
         <UserProfile user={user} loggedInUserId={loggedInUser.id} />
-        <div className="rounded-2xl bg-card p-5 shadow-sm">
-          <h2 className="text-center text-2xl font-bold">
-            {user.displayName}&apos;s posts
-          </h2>
-        </div>
-        <UserPosts userId={user.id} />
       </div>
-      <TrendsSidebar />
     </main>
   );
 }
@@ -108,32 +96,13 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
             <div className="text-muted-foreground">@{user.username}</div>
           </div>
           <div>Member since {formatDate(user.createdAt, "MMM d, yyyy")}</div>
-          <div className="flex items-center gap-3">
-            <span>
-              Posts:{" "}
-              <span className="font-semibold">
-                {formatNumber(user._count.posts)}
-              </span>
-            </span>
-            <FollowerCount userId={user.id} initialState={followerInfo} />
-          </div>
         </div>
         {user.id === loggedInUserId ? (
           <EditProfileButton user={user} />
         ) : (
-          <FollowButton userId={user.id} initialState={followerInfo} />
+          <></>
         )}
       </div>
-      {user.bio && (
-        <>
-          <hr />
-          <Linkify>
-            <div className="overflow-hidden whitespace-pre-line break-words">
-              {user.bio}
-            </div>
-          </Linkify>
-        </>
-      )}
     </div>
   );
 }
