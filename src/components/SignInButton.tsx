@@ -17,12 +17,6 @@ const SignInButton = ({ textSignIn, textSignUp }: Props) => {
       >
         {textSignIn}
       </Button>
-      <Button
-        className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300"
-        onClick={() => router.push("/signup")}
-      >
-        {textSignUp}
-      </Button>
     </div>
   );
 };
