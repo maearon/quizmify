@@ -31,5 +31,5 @@ export async function logout() {
   //   sessionStorage.removeItem("remember_token")
   // }
 
-  return redirect("/login");
+  return redirect("/");
 }
