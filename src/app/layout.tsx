@@ -22,10 +22,10 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Interview Questions",
-    default: "Interview Questions",
+    template: "%s | Quizzzy 🔥",
+    default: "Quizzzy 🔥",
   },
-  description: "The Interview Questions app for staffs",
+  description: "The Quizzzy 🔥! is a platform for creating quizzes using AI!",
 };
 
 export default async function RootLayout({
