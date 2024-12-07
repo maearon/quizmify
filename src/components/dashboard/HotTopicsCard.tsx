@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -6,20 +8,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import dynamic from 'next/dynamic';
-const WordCloud = dynamic(() => import('../WordCloud'), { ssr: false });
-import { prisma } from "@/lib/db";
+import dynamic from "next/dynamic";
 
-type Props = {};
+const WordCloud = dynamic(() => import("../WordCloud"), { ssr: false });
 
-const HotTopicsCard = async (props: Props) => {
-  const topics = await prisma.topic_count.findMany({});
-  const formattedTopics = topics.map((topic) => {
-    return {
-      text: topic.topic,
-      value: topic.count,
+type Topic = {
+  text: string;
+  value: number;
+};
+
+const HotTopicsCard = () => {
+  const [formattedTopics, setFormattedTopics] = useState<Topic[]>([]);
+
+  useEffect(() => {
+    const fetchTopics = async () => {
+      const response = await fetch("/api/topics");
+      const data = await response.json();
+      const formattedData = data.map((topic: any) => ({
+        text: topic.topic,
+        value: topic.count,
+      }));
+      setFormattedTopics(formattedData);
     };
-  });
+
+    fetchTopics();
+  }, []);
+
   return (
     <Card className="col-span-4">
       <CardHeader>

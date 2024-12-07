@@ -21,21 +21,41 @@ export function ThemeToggle({
     return null;
   }
 
-  const themes = ["light", "dark", "system"];
-  const currentTheme = theme ?? "system";
-  const currentIndex = themes.indexOf(currentTheme);
+  // Define theme options with icons for different themes
+  const themeOptions = {
+    light: <Sun className="h-[1.2rem] w-[1.2rem]" />,
+    dark: <Moon className="h-[1.2rem] w-[1.2rem]" />,
+    system: <Monitor className="h-[1.2rem] w-[1.2rem]" />,
+  };
+
+  const currentTheme = theme ?? "system"; // Default to system if no theme is set
+
+  // Type guard for valid theme values
+  const isValidTheme = (theme: string): theme is keyof typeof themeOptions => 
+    theme === "light" || theme === "dark" || theme === "system";
+
+  // Calculate the next theme based on the current theme
+  const getNextTheme = () => {
+    switch (currentTheme) {
+      case "light":
+        return "dark";
+      case "dark":
+        return "system";
+      case "system":
+        return "light";
+      default:
+        return "system"; // Fallback to 'system' if invalid
+    }
+  };
 
   const toggleTheme = () => {
-    const nextTheme = themes[(currentIndex + 1) % themes.length];
-    setTheme(nextTheme);
+    setTheme(getNextTheme()); // Switch to the next theme in the cycle
   };
 
   return (
     <div className={className} {...props}>
       <Button variant="outline" size="icon" onClick={toggleTheme}>
-        {currentTheme === "light" && <Sun className="h-[1.2rem] w-[1.2rem]" />}
-        {currentTheme === "dark" && <Moon className="h-[1.2rem] w-[1.2rem]" />}
-        {currentTheme === "system" && <Monitor className="h-[1.2rem] w-[1.2rem]" />}
+        {isValidTheme(currentTheme) && themeOptions[currentTheme]}
         <span className="sr-only">Toggle theme</span>
       </Button>
     </div>
