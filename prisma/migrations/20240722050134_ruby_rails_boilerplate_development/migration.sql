@@ -1,7 +1,4 @@
 -- CreateEnum
-CREATE TYPE "GameType" AS ENUM ('mcq', 'open_ended');
-
--- CreateEnum
 CREATE TYPE "MediaType" AS ENUM ('IMAGE', 'VIDEO');
 
 -- CreateEnum
@@ -33,69 +30,6 @@ CREATE TABLE "users" (
     "reset_sent_at" TIMESTAMP(6),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "sessions" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Account" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
-    "provider" TEXT NOT NULL,
-    "providerAccountId" TEXT NOT NULL,
-    "refresh_token" TEXT,
-    "access_token" TEXT,
-    "expires_at" INTEGER,
-    "token_type" TEXT,
-    "scope" TEXT,
-    "id_token" TEXT,
-    "session_state" TEXT,
-
-    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Game" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "timeStarted" TIMESTAMP(3) NOT NULL,
-    "topic" TEXT NOT NULL,
-    "timeEnded" TIMESTAMP(3),
-    "gameType" "GameType" NOT NULL,
-
-    CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "topic_count" (
-    "id" TEXT NOT NULL,
-    "topic" TEXT NOT NULL,
-    "count" INTEGER NOT NULL,
-
-    CONSTRAINT "topic_count_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Question" (
-    "id" TEXT NOT NULL,
-    "question" TEXT NOT NULL,
-    "answer" TEXT NOT NULL,
-    "gameId" TEXT NOT NULL,
-    "options" JSONB,
-    "percentageCorrect" DOUBLE PRECISION,
-    "isCorrect" BOOLEAN,
-    "questionType" "GameType" NOT NULL,
-    "userAnswer" TEXT,
-
-    CONSTRAINT "Question_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -215,7 +149,7 @@ CREATE TABLE "messages" (
 CREATE TABLE "microposts" (
     "id" BIGSERIAL NOT NULL,
     "content" TEXT,
-    "user_id" TEXT NOT NULL,
+    "user_id" BIGINT NOT NULL,
     "created_at" TIMESTAMP(6) NOT NULL,
     "updated_at" TIMESTAMP(6) NOT NULL,
 
@@ -280,8 +214,8 @@ CREATE TABLE "projects" (
 -- CreateTable
 CREATE TABLE "relationships" (
     "id" BIGSERIAL NOT NULL,
-    "follower_id" TEXT,
-    "followed_id" TEXT,
+    "follower_id" INTEGER,
+    "followed_id" INTEGER,
     "created_at" TIMESTAMP(6) NOT NULL,
     "updated_at" TIMESTAMP(6) NOT NULL,
 
@@ -367,6 +301,15 @@ CREATE TABLE "wishes" (
 );
 
 -- CreateTable
+CREATE TABLE "sessions" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "follows" (
     "followerId" TEXT NOT NULL,
     "followingId" TEXT NOT NULL
@@ -444,21 +387,6 @@ CREATE UNIQUE INDEX "index_admin_users_refresh_token_uniqueness" ON "users"("ref
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_googleId_key" ON "users"("googleId");
-
--- CreateIndex
-CREATE INDEX "Account_userId_idx" ON "Account"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
-
--- CreateIndex
-CREATE INDEX "Game_userId_idx" ON "Game"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "topic_count_topic_key" ON "topic_count"("topic");
-
--- CreateIndex
-CREATE INDEX "Question_gameId_idx" ON "Question"("gameId");
 
 -- CreateIndex
 CREATE INDEX "index_active_storage_attachments_on_blob_id" ON "active_storage_attachments"("blob_id");
@@ -563,18 +491,6 @@ CREATE UNIQUE INDEX "likes_userId_postId_key" ON "likes"("userId", "postId");
 CREATE UNIQUE INDEX "bookmarks_userId_postId_key" ON "bookmarks"("userId", "postId");
 
 -- AddForeignKey
-ALTER TABLE "sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Game" ADD CONSTRAINT "Game_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Question" ADD CONSTRAINT "Question_gameId_fkey" FOREIGN KEY ("gameId") REFERENCES "Game"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "active_storage_attachments" ADD CONSTRAINT "fk_rails_c3b3935057" FOREIGN KEY ("blob_id") REFERENCES "active_storage_blobs"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -608,9 +524,6 @@ ALTER TABLE "guest_wish_items" ADD CONSTRAINT "fk_rails_ed1f2f0948" FOREIGN KEY 
 ALTER TABLE "messages" ADD CONSTRAINT "fk_rails_a8db0fb63a" FOREIGN KEY ("room_id") REFERENCES "rooms"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "microposts" ADD CONSTRAINT "fk_rails_558c81314b" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
 ALTER TABLE "order_items" ADD CONSTRAINT "fk_rails_476172d337" FOREIGN KEY ("variant_id") REFERENCES "variants"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -636,6 +549,9 @@ ALTER TABLE "wish_items" ADD CONSTRAINT "fk_rails_6357d5ef81" FOREIGN KEY ("wish
 
 -- AddForeignKey
 ALTER TABLE "wish_items" ADD CONSTRAINT "fk_rails_f4c6b03fcc" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "follows" ADD CONSTRAINT "follows_followerId_fkey" FOREIGN KEY ("followerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
