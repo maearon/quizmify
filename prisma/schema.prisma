@@ -14,7 +14,7 @@ model User {
   id                    String         @id
   name                        String?      @db.VarChar
   username              String         @unique
-  displayName           String
+  displayName           String?
   email                       String?      @unique(map: "index_admin_users_email_uniqueness") @db.VarChar
   refresh_token               String?      @unique(map: "index_admin_users_refresh_token_uniqueness") @db.VarChar
   refresh_token_expiration_at DateTime?    @db.Timestamp(6)
@@ -35,11 +35,12 @@ model User {
   reset_sent_at               DateTime?    @db.Timestamp(6)
   games                       Game[]
   accounts                    Account[]
-  sessions                    Session[]
+  // sessions                    Session[]
   // carts                       carts[]
   microposts                  microposts[]
   // orders                      orders[]
   // reviews                     reviews[]
+  sessions                    Session[]
   // wishes                      wishes[]
   posts                 Post[]
   following             Follow[]       @relation("Following")
@@ -53,14 +54,47 @@ model User {
   @@map("users")
 }
 
-model Session {
-  id        String   @id
-  userId    String
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// model User {
+//   id                    String         @id
+//   username              String         @unique
+//   displayName           String
+//   email                 String?        @unique
+//   passwordHash          String?
+//   googleId              String?        @unique
+//   avatarUrl             String?
+//   bio                   String?
+//   sessions              Session[]
+//   posts                 Post[]
+//   following             Follow[]       @relation("Following")
+//   followers             Follow[]       @relation("Followers")
+//   likes                 Like[]
+//   bookmarks             Bookmark[]
+//   comments              Comment[]
+//   receivedNotifications Notification[] @relation("Recipient")
+//   issuedNotifications   Notification[] @relation("Issuer")
 
-  @@map("sessions")
-}
+//   createdAt DateTime @default(now())
+
+//   @@map("users")
+// }
+
+// model Session {
+//   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.VarChar
+//   expiresAt DateTime @db.Timestamp(6)
+//   userId    BigInt
+//   user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_cb343d5f27")
+
+//   @@map("sessions")
+// }
+
+// model Session {
+//   id        String   @id
+//   userId    String
+//   expiresAt DateTime
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// 
+//   @@map("sessions")
+// }
 
 model Account {
   id                String  @id @default(cuid())
@@ -463,6 +497,18 @@ model wishes {
 
 //   @@map("users")
 // }
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+  // ✅ Sửa dòng này:
+  payload   Json? // <-- cho phép null bằng cách thêm `?`
+}
+
 
 model Follow {
   followerId  String
