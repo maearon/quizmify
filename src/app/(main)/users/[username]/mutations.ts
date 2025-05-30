@@ -36,37 +36,11 @@ export function useUpdateProfileMutation() {
     onSuccess: async ([updatedUser, uploadResult]) => {
       const newAvatarUrl = uploadResult?.[0].serverData.avatarUrl;
 
-      const queryFilter: QueryFilters = {
-        queryKey: ["post-feed"],
-      };
-
-      await queryClient.cancelQueries(queryFilter);
-
-      queryClient.setQueriesData<InfiniteData<PostsPage, string | null>>(
-        queryFilter,
-        (oldData) => {
-          if (!oldData) return;
-
-          return {
-            pageParams: oldData.pageParams,
-            pages: oldData.pages.map((page) => ({
-              nextCursor: page.nextCursor,
-              posts: page.posts.map((post) => {
-                if (post.user.id === updatedUser.id) {
-                  return {
-                    ...post,
-                    user: {
-                      ...updatedUser,
-                      avatarUrl: newAvatarUrl || updatedUser.avatarUrl,
-                    },
-                  };
-                }
-                return post;
-              }),
-            })),
-          };
-        },
-      );
+      // Cập nhật cache thông tin người dùng
+      queryClient.setQueryData(["user", updatedUser.username], {
+        ...updatedUser,
+        avatarUrl: newAvatarUrl || updatedUser.avatarUrl,
+      });
 
       router.refresh();
 
