@@ -1,8 +1,8 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { Clock, CopyCheck, Edit2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import MCQCounter from "./MCQCounter";
 
 type Props = {
   limit: number;
