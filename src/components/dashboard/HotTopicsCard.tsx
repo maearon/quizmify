@@ -22,7 +22,7 @@ const HotTopicsCard = () => {
 
   useEffect(() => {
     const fetchTopics = async () => {
-      const response = await fetch("/api/topics");
+      const response = await fetch("/api/topics", { cache: "no-store" });
       const data = await response.json();
       const formattedData = data.map((topic: any) => ({
         text: topic.topic,
