@@ -10,6 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@google/genai": "^1.22.0",
     "@hookform/resolvers": "^3.9.0",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@prisma/client": "^5.16.1",
@@ -38,6 +39,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "json5": "^2.2.3",
     "keyword-extractor": "^0.0.28",
     "ky": "^1.4.0",
     "lucia": "^3.2.0",

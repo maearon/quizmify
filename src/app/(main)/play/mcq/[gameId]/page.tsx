@@ -1,6 +1,6 @@
 import MCQ from "@/components/MCQ";
 import prisma from "@/lib/prisma";
-import { validateRequest } from "@/auth";;
+import { validateRequest } from "@/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 

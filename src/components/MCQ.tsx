@@ -30,7 +30,7 @@ const MCQ = ({ game }: Props) => {
     correct_answers: 0,
     wrong_answers: 0,
   });
-  const [selectedChoice, setSelectedChoice] = React.useState<number>(0);
+  const [selectedChoice, setSelectedChoice] = React.useState<number>(-1);
   const [now, setNow] = React.useState(new Date());
 
   const currentQuestion = React.useMemo(() => {
@@ -102,6 +102,8 @@ const MCQ = ({ game }: Props) => {
           setHasEnded(true);
           return;
         }
+        // ⬇️ ADD THIS LINE: reset selection before moving on
+        setSelectedChoice(-1);
         setQuestionIndex((questionIndex) => questionIndex + 1);
       },
     });
@@ -170,20 +172,25 @@ const MCQ = ({ game }: Props) => {
           wrong_answers={stats.wrong_answers}
         />
       </div>
-      <Card className="w-full mt-4">
-        <CardHeader className="flex flex-row items-center">
-          <CardTitle className="mr-5 text-center divide-y divide-zinc-600/50">
-            <div>{questionIndex + 1}</div>
-            <div className="text-base text-slate-400">
-              {game.questions.length}
-            </div>
-          </CardTitle>
-          <CardDescription className="flex-grow text-lg">
-            {currentQuestion?.question}
-          </CardDescription>
-        </CardHeader>
-      </Card>
-      <div className="flex flex-col items-center justify-center w-full mt-4">
+      <div key={questionIndex}>
+        <Card className="w-full mt-4">
+          <CardHeader className="flex flex-row items-center">
+            <CardTitle className="mr-5 text-center divide-y divide-zinc-600/50">
+              <div>{questionIndex + 1}</div>
+              <div className="text-base text-slate-400">
+                {game.questions.length}
+              </div>
+            </CardTitle>
+            <CardDescription className="flex-grow text-lg">
+              {currentQuestion?.question}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+      <div 
+        key={currentQuestion.id}
+        className="flex flex-col items-center justify-center w-full mt-4"
+      >
         {options.map((option, index) => {
           return (
             <Button
@@ -205,7 +212,7 @@ const MCQ = ({ game }: Props) => {
           variant="default"
           className="mt-2"
           size="lg"
-          disabled={isChecking || hasEnded}
+          disabled={isChecking || hasEnded || selectedChoice === -1}
           onClick={() => {
             handleNext();
           }}
